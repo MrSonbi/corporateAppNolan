@@ -1,17 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Geolocation } from '@capacitor/geolocation';
+
 @Injectable({
     providedIn: 'root'
 })
-
 export class GeolocationService {
     async getCurrentPosition() {
-        const data =
-            await Geolocation.getCurrentPosition();
+        const data = await Geolocation.getCurrentPosition({
+            timeout: 15000,          // Aumentamos el tiempo de espera a 15 segundos
+            enableHighAccuracy: true // Forzamos alta precisión para el emulador
+        });
         const oficinaLat = 40.4452;
         const oficinaLon = -3.6115;
         return data.coords;
     }
+
     calcularDistancia(
         lat1: number,
         lon1: number,
@@ -19,22 +22,17 @@ export class GeolocationService {
         lon2: number
     ) {
         const R = 6371;
-        const dLat =
-            (lat2 - lat1) * Math.PI / 180;
-        const dLon =
-            (lon2 - lon1) * Math.PI / 180;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
         const a =
-            Math.sin(dLat / 2)
-        * Math.sin(dLat / 2) +
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
             Math.cos(lat1 * Math.PI / 180) *
-        Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * 
-        Math.sin(dLon / 2);
-        const c =
-            2 * Math.atan2(
-                Math.sqrt(a),
-                Math.sqrt(1 - a)
-            );
+            Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1 - a)
+        );
         return R * c;
     }
 }
